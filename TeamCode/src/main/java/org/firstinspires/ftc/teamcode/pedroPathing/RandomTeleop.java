@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
+//Only used to experiment, not official code for anything
 @TeleOp
 public class RandomTeleop extends LinearOpMode {
     //Field Oriented
