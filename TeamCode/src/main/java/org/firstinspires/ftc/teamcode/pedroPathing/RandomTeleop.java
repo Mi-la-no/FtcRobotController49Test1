@@ -2,12 +2,21 @@ package org.firstinspires.ftc.teamcode.pedroPathing;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
 
+import com.pedropathing.follower.Follower;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.IMU;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-public class RandomTeleop {
+@TeleOp
+public class RandomTeleop extends LinearOpMode {
     //Field Oriented
 
     // 1. Retrieve the robot's current heading from the IMU
+    public IMU imu;
+
+    public Follower follower;
     double robotHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
     // 2. Read raw joystick inputs from gamepad
@@ -29,9 +38,24 @@ public class RandomTeleop {
     double backRightPower = (rotY + rotX - rx) / denominator;
 
 // 6. Set power to the hardware motors
-frontLeft.setPower(frontLeftPower);
-backLeft.setPower(backLeftPower);
-frontRight.setPower(frontRightPower);
-backRight.setPower(backRightPower);
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        follower = Constants.createFollower(hardwareMap);
+        follower.update();
+
+        waitForStart();
+        follower.startTeleopDrive();
+        while(isStarted()){
+            follower.setTeleOpDrive(
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
+                    -gamepad1.right_stick_x,
+                    false
+            );
+        }
+    }
+
+
 
 }
