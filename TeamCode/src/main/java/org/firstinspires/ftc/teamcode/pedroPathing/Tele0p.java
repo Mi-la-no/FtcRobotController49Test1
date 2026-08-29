@@ -21,7 +21,7 @@ public class Tele0p extends OpMode{
         private Supplier<PathChain> pathChain;
         private TelemetryManager telemetryM;
         private boolean slowMode = false;
-        private double slowModeMultiplier = 0.5;
+        private double slowModeMultiplier = 0.67;
         @Override
         public void init() {
             follower = Constants.createFollower(hardwareMap);
