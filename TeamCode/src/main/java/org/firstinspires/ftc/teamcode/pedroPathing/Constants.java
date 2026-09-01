@@ -4,6 +4,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.paths.PathConstraints;
+import com.pedropathing.ftc.drivetrains.MecanumConstants;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Constants {
@@ -11,9 +13,22 @@ public class Constants {
 
         public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
+
+        public static MecanumConstants driveConstants = new MecanumConstants()
+                .maxPower(1)
+                .rightFrontMotorName("rf")
+                .rightRearMotorName("rr")
+                .leftRearMotorName("lr")
+                .leftFrontMotorName("lf")
+                .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+                .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+                .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+                .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
+
         public static Follower createFollower(HardwareMap hardwareMap) {
             return new FollowerBuilder(followerConstants, hardwareMap)
                     .pathConstraints(pathConstraints)
+                    .mecanumDrivetrain(driveConstants)
                     .build();
         }
     }
