@@ -11,12 +11,15 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+
 import java.util.function.Supplier;
 
 @Configurable
 @TeleOp
 public class Teleop extends OpMode {
     private Follower follower;
+    private Intake intake;
     public static Pose startingPose; //See ExampleAuto to understand how to use this
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
@@ -27,6 +30,7 @@ public class Teleop extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
+        intake = new Intake(hardwareMap);
         follower.setStartingPose(startingPose == null ? new Pose() : startingPose);
         follower.update();
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -101,6 +105,15 @@ public class Teleop extends OpMode {
         if (gamepad2.yWasPressed()) {
             slowModeMultiplier -= 0.25;
         }
+
+        if (gamepad1.dpad_up){
+            intake.setState(Intake.IntakeState.FORWARD);
+        } else if (gamepad1.dpad_down){
+            intake.setState(Intake.IntakeState.BACKWARD);
+        } else {
+            intake.setState(Intake.IntakeState.INIT);
+        }
+
 
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
