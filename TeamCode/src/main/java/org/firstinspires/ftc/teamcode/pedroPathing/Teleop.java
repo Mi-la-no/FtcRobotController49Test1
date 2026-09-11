@@ -67,7 +67,7 @@ public class Teleop extends OpMode {
                     -gamepad1.left_stick_y,
                     -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
-                    true // Robot Centric
+                    false // Robot Centric
             );
 
                 //This is how it looks with slowMode on
@@ -75,7 +75,7 @@ public class Teleop extends OpMode {
                     -gamepad1.left_stick_y * slowModeMultiplier,
                     -gamepad1.left_stick_x * slowModeMultiplier,
                     -gamepad1.right_stick_x * slowModeMultiplier,
-                    true // Robot Centric
+                    false // Robot Centric
             );
         }
 
