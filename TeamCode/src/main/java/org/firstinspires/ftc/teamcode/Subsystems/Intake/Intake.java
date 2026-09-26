@@ -1,9 +1,10 @@
-package org.firstinspires.ftc.teamcode.Subsystems;
+package org.firstinspires.ftc.teamcode.Subsystems.Intake;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.Subsystems.Robot.MyRobot;
 
 public class Intake extends SubsystemBase{
     public DcMotor Intake;
@@ -17,8 +18,8 @@ public class Intake extends SubsystemBase{
         BACKWARD
     }
 
-    public Intake (HardwareMap hardwareMap){
-        this.Intake = hardwareMap.get(DcMotor.class, "IntakeMotor");
+    public Intake (MyRobot robot){
+        this.Intake = robot.hardwareMap.get(DcMotor.class, "IntakeMotor");
     }
 
     public void setState (IntakeState state) {
