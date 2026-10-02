@@ -19,5 +19,7 @@ dependencies {
 
     implementation 'com.pedropathing:revhub:3.0.0'
     implementation 'com.pedropathing:tuning:1.0.0'
+
+    implementation "com.bylazar:fullpanels:1.0.12"
 }
 

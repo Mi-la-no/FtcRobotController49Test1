@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Robot;
 
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.Robot;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -16,10 +18,16 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Intake.IntakeState;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeCommands.ActuateIntakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringCommands.SpinScoringIntakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringCommands.SpinShooterCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringIntakeSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringSubsystem;
 
 public class MyRobot extends Robot {
-    DriveSubsystem drive;
+    //DriveSubsystem drive;
     Intake intake;
+    ScoringSubsystem shooter;
+    ScoringIntakeSubsystem scoringIntake;
     DefaultDriveCommand defaultDriveCommand;
     SlowModeCommand slowModeCommand;
 
@@ -46,34 +54,61 @@ public class MyRobot extends Robot {
 
     public void initTele (TeleopMode mode){
         if (mode == TeleopMode.RED){
-            drive = new DriveSubsystem(this);
+            //drive = new DriveSubsystem(this);
             intake = new Intake(this);
+            shooter = new ScoringSubsystem(this);
+            scoringIntake = new ScoringIntakeSubsystem(this);
 
-            defaultDriveCommand = new DefaultDriveCommand(drive,
-                    driver::getLeftX,
-                    driver::getLeftY,
-                    driver::getRightX
-            );
+//            defaultDriveCommand = new DefaultDriveCommand(drive,
+//                    driver::getLeftX,
+//                    driver::getLeftY,
+//                    driver::getRightX
+//            );
+//
+//            slowModeCommand = new SlowModeCommand(drive,
+//                    driver::getLeftX,
+//                    driver::getLeftY,
+//                    driver::getRightX
+//            );
 
-            slowModeCommand = new SlowModeCommand(drive,
-                    driver::getLeftX,
-                    driver::getLeftY,
-                    driver::getRightX
-            );
-
-            CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
-
+            //CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
+            CommandScheduler.getInstance().setDefaultCommand(shooter, new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD));
             Button driverIntakeForward = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
             Button driverIntakeBackward = new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN);
             Button driverSlowMode = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER);
+            Button shooterStart = new GamepadButton(driver, GamepadKeys.Button.Y);
+            Button shooterReverse = new GamepadButton(driver, GamepadKeys.Button.A);
+            Button shooterStop = new GamepadButton(driver, GamepadKeys.Button.X);
 
-            driverSlowMode
+            /*driverSlowMode
                     .whenPressed(slowModeCommand)
-                    .whenReleased(defaultDriveCommand);
+                    .whenReleased(defaultDriveCommand);*/
 
             driverIntakeForward
                     .whenPressed(new ActuateIntakeCommand(intake, IntakeState.FORWARD))
-                    .whenReleased(new ActuateIntakeCommand(intake, IntakeState.FORWARD));
+                    .whenReleased(new ActuateIntakeCommand(intake, IntakeState.INIT));
+
+            driverIntakeBackward
+                    .whenPressed(new ActuateIntakeCommand(intake, IntakeState.BACKWARD))
+                    .whenReleased(new ActuateIntakeCommand(intake, IntakeState.INIT));
+
+            shooterStart
+                    .whenPressed(
+                            new ParallelCommandGroup
+                                    (
+                                            new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.SHOOT),
+                                            new ActuateIntakeCommand(intake, IntakeState.BACKWARD)
+                                    ));
+
+            shooterReverse
+                    .whenPressed(new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.BACKWARD));
+
+            shooterStop
+                    .whenPressed(new ParallelCommandGroup
+                            (
+                                    new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT),
+                                    new ActuateIntakeCommand(intake, IntakeState.BACKWARD)
+                            ));
         }
     }
 
