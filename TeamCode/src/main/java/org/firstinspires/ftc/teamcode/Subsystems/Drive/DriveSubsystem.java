@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 public class DriveSubsystem extends SubsystemBase {
     private MyRobot robot;
     private Follower follower;
-    public boolean fieldOriented = false;
+    public boolean fieldOriented = true;
     public boolean autoDriving;
     public ElapsedTime autoTimer = new ElapsedTime();
 
