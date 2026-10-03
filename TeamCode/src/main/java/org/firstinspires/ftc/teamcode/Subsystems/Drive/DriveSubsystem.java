@@ -27,7 +27,7 @@ public class DriveSubsystem extends SubsystemBase {
     public boolean autoDriving;
     public ElapsedTime autoTimer = new ElapsedTime();
     private final PoseFactory poseFactory = PoseFactory.degrees();
-    private final Pose startPose = poseFactory.of(133, 108, 180);
+    private final Pose startPose = poseFactory.of(133, 108, 0);
     private final Pose scorePose = poseFactory.of(83,130,270);
 
     private Path startToScore() {
@@ -41,6 +41,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
     public DriveSubsystem(MyRobot robot){
         follower = Constants.create(robot.hardwareMap);
+        follower.setPose(startPose);
     }
 
     public void setDrivePower(double leftX, double leftY, double rightX){
@@ -72,6 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void driveTo() {
         Scheduler.reset();
+        schedule(autoRoutine());
         follower.update();
         Scheduler.execute();
     }

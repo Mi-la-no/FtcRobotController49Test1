@@ -59,6 +59,7 @@ public class MyRobot extends Robot {
             intake = new Intake(this);
             shooter = new ScoringSubsystem(this);
             scoringIntake = new ScoringIntakeSubsystem(this);
+            drive.setFieldOriented(false);
 
             defaultDriveCommand = new DefaultDriveCommand(drive,
                     driver::getLeftX,
@@ -84,11 +85,10 @@ public class MyRobot extends Robot {
             driverSlowMode
                     .whenPressed(slowModeCommand)
                     .whenReleased(defaultDriveCommand);
-
+            
             autoDrive
                     .whenPressed(new AutoDriveCommand(drive))
                             .whenReleased(defaultDriveCommand);
-
             shooterStart
                     .whenPressed(
                             new ParallelCommandGroup
