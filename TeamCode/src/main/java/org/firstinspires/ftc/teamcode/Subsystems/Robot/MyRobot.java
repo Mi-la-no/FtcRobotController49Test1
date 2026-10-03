@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringIntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringSubsystem;
 
 public class MyRobot extends Robot {
-    //DriveSubsystem drive;
+    DriveSubsystem drive;
     Intake intake;
     ScoringSubsystem shooter;
     ScoringIntakeSubsystem scoringIntake;
@@ -54,24 +54,24 @@ public class MyRobot extends Robot {
 
     public void initTele (TeleopMode mode){
         if (mode == TeleopMode.RED){
-            //drive = new DriveSubsystem(this);
+            drive = new DriveSubsystem(this);
             intake = new Intake(this);
             shooter = new ScoringSubsystem(this);
             scoringIntake = new ScoringIntakeSubsystem(this);
 
-//            defaultDriveCommand = new DefaultDriveCommand(drive,
-//                    driver::getLeftX,
-//                    driver::getLeftY,
-//                    driver::getRightX
-//            );
-//
-//            slowModeCommand = new SlowModeCommand(drive,
-//                    driver::getLeftX,
-//                    driver::getLeftY,
-//                    driver::getRightX
-//            );
+            defaultDriveCommand = new DefaultDriveCommand(drive,
+                    driver::getLeftX,
+                    driver::getLeftY,
+                    driver::getRightX
+            );
 
-            //CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
+            slowModeCommand = new SlowModeCommand(drive,
+                    driver::getLeftX,
+                    driver::getLeftY,
+                    driver::getRightX
+            );
+
+            CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
             CommandScheduler.getInstance().setDefaultCommand(shooter, new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD));
             Button driverIntakeForward = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
             Button driverIntakeBackward = new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN);
@@ -80,9 +80,9 @@ public class MyRobot extends Robot {
             Button shooterReverse = new GamepadButton(driver, GamepadKeys.Button.A);
             Button shooterStop = new GamepadButton(driver, GamepadKeys.Button.X);
 
-            /*driverSlowMode
+            driverSlowMode
                     .whenPressed(slowModeCommand)
-                    .whenReleased(defaultDriveCommand);*/
+                    .whenReleased(defaultDriveCommand);
 
             driverIntakeForward
                     .whenPressed(new ActuateIntakeCommand(intake, IntakeState.FORWARD))

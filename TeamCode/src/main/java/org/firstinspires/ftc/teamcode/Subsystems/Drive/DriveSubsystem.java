@@ -21,9 +21,9 @@ public class DriveSubsystem extends SubsystemBase {
     public void setDrivePower(double leftX, double leftY, double rightX){
         if (fieldOriented) {
             DrivePowers powers = ManualDrive.fieldCentric(
-                    -leftY,
-                    leftX,
-                    rightX,
+                    leftY,
+                    -leftX,
+                    -rightX,
                     follower.pose().heading()
             );
 
@@ -31,9 +31,9 @@ public class DriveSubsystem extends SubsystemBase {
             follower.update();
         } else {
             follower.manual(
-                    -leftY,
-                    leftX,
-                    rightX
+                    leftY,
+                    -leftX,
+                    -rightX
             );
 
             follower.update();
