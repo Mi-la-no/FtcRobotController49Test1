@@ -1,1 +1,100 @@
+package org.firstinspires.ftc.teamcode.limelight;
+
+
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+
+import java.util.List;
+
+
+@TeleOp(name = "Limelight Testing", group = "Limelight")
+public class LimelightTesting extends LinearOpMode {
+
+
+   private Limelight3A limelight;
+
+
+   @Override
+   public void runOpMode() throws InterruptedException {
+
+
+       // Connect to the Limelight using the name we configured earlier
+       limelight = hardwareMap.get(Limelight3A.class, "limelight");
+
+
+       // Use Pipeline 0 = Neural Detector
+       limelight.pipelineSwitch(0);
+
+
+       // Start receiving Limelight data
+       limelight.start();
+
+
+       telemetry.addLine("Limelight connected!");
+       telemetry.addLine("Pipeline 0 = Neural Detector");
+       telemetry.addLine("Press PLAY to begin.");
+       telemetry.update();
+
+
+       waitForStart();
+
+
+       while (opModeIsActive()) {
+
+
+           LLResult result = limelight.getLatestResult();
+
+
+           if (result != null && result.isValid()) {
+
+
+               telemetry.addData("TX", "%.2f degrees", result.getTx());
+               telemetry.addData("TY", "%.2f degrees", result.getTy());
+
+
+               List<LLResultTypes.DetectorResult> detectorResults =
+                       result.getDetectorResults();
+
+
+               telemetry.addData("Detections", detectorResults.size());
+
+
+               for (LLResultTypes.DetectorResult detector : detectorResults) {
+
+
+                   telemetry.addData(
+                           "Object",
+                           "%s | Confidence: %.1f%%",
+                           detector.getClassName(),
+                           detector.getConfidence() * 100.0
+                   );
+
+
+                   telemetry.addData(
+                           "Area",
+                           "%.3f",
+                           detector.getTargetArea()
+                   );
+               }
+
+
+           } else {
+
+
+               telemetry.addLine("No valid Limelight result");
+           }
+
+
+           telemetry.update();
+       }
+
+
+       limelight.stop();
+   }
+}
+
 
