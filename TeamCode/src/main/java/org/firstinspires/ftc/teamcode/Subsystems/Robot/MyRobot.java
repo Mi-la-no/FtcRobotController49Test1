@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveCommand.AutoDriveCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveCommand.DefaultDriveCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveCommand.SlowModeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
@@ -58,6 +59,7 @@ public class MyRobot extends Robot {
             intake = new Intake(this);
             shooter = new ScoringSubsystem(this);
             scoringIntake = new ScoringIntakeSubsystem(this);
+            drive.setFieldOriented(false);
 
             defaultDriveCommand = new DefaultDriveCommand(drive,
                     driver::getLeftX,
@@ -73,42 +75,38 @@ public class MyRobot extends Robot {
 
             CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
             CommandScheduler.getInstance().setDefaultCommand(shooter, new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD));
-            Button driverIntakeForward = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
-            Button driverIntakeBackward = new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN);
-            Button driverSlowMode = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER);
-            Button shooterStart = new GamepadButton(driver, GamepadKeys.Button.Y);
+            CommandScheduler.getInstance().setDefaultCommand(intake, new ActuateIntakeCommand(intake, IntakeState.BACKWARD));
+            Button driverSlowMode = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+            Button shooterStart = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER);
+            Button autoDrive = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
             Button shooterReverse = new GamepadButton(driver, GamepadKeys.Button.A);
             Button shooterStop = new GamepadButton(driver, GamepadKeys.Button.X);
 
             driverSlowMode
                     .whenPressed(slowModeCommand)
                     .whenReleased(defaultDriveCommand);
-
-            driverIntakeForward
-                    .whenPressed(new ActuateIntakeCommand(intake, IntakeState.FORWARD))
-                    .whenReleased(new ActuateIntakeCommand(intake, IntakeState.INIT));
-
-            driverIntakeBackward
-                    .whenPressed(new ActuateIntakeCommand(intake, IntakeState.BACKWARD))
-                    .whenReleased(new ActuateIntakeCommand(intake, IntakeState.INIT));
-
+            
+            autoDrive
+                    .whenPressed(new AutoDriveCommand(drive))
+                            .whenReleased(defaultDriveCommand);
             shooterStart
                     .whenPressed(
                             new ParallelCommandGroup
                                     (
-                                            new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.SHOOT),
-                                            new ActuateIntakeCommand(intake, IntakeState.BACKWARD)
-                                    ));
+                                            new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.SHOOT)
+                                    ))
+                            .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));
 
             shooterReverse
-                    .whenPressed(new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.BACKWARD));
+                    .whenPressed(new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.BACKWARD))
+                    .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));;
 
             shooterStop
                     .whenPressed(new ParallelCommandGroup
                             (
-                                    new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT),
-                                    new ActuateIntakeCommand(intake, IntakeState.BACKWARD)
+                                    new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT)
                             ));
+
         }
     }
 

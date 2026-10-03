@@ -1,12 +1,19 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Drive;
 
 import static com.pedropathing.api.Paths.line;
+import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.Scheduler;
+import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.groups.Groups.sequential;
+import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.drivetrain.DrivePowers;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
 import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -19,22 +26,25 @@ public class DriveSubsystem extends SubsystemBase {
     public boolean fieldOriented = true;
     public boolean autoDriving;
     public ElapsedTime autoTimer = new ElapsedTime();
+    private final PoseFactory poseFactory = PoseFactory.degrees();
+    private final Pose startPose = poseFactory.of(133, 108, 0);
+    private final Pose scorePose = poseFactory.of(83,130,270);
 
+    private Path startToScore() {
+        return line(startPose, scorePose).linear(startPose, scorePose);
+    }
+    private Command autoRoutine() {
+        return sequential(
+                follow(follower, startToScore())
+                // Add mechanism commands here
+        );
+    }
     public DriveSubsystem(MyRobot robot){
         follower = Constants.create(robot.hardwareMap);
+        follower.setPose(startPose);
     }
 
     public void setDrivePower(double leftX, double leftY, double rightX){
-        if (autoDriving) {
-            if (Math.max(Math.max(Math.abs(leftX), Math.abs(leftY)), Math.abs(rightX)) > 0.2
-                    || autoTimer.seconds() >= 4) {
-                autoDriving = false;
-            } else {
-                follower.update();
-                if (follower.isBusy()) return;
-                autoDriving = false;
-            }
-        }
         if (fieldOriented) {
             DrivePowers powers = ManualDrive.fieldCentric(
                     leftY,
@@ -61,13 +71,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
     public boolean isReady() { return follower != null; }
 
-    public void driveTo(Pose target) {
-        if (target == null || follower == null) return;
-        Pose start = follower.pose();
-        if (start.distance(target) < 0.5) follower.hold(target);
-        else follower.follow(line(start, target).linear(start.heading(), target.heading()));
-        autoTimer.reset();
-        autoDriving = true;
+    public void driveTo() {
+        Scheduler.reset();
+        schedule(autoRoutine());
+        follower.update();
+        Scheduler.execute();
     }
 
 }
