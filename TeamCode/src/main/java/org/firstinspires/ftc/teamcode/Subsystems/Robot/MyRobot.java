@@ -41,8 +41,8 @@ public class MyRobot extends Robot {
     public GamepadEx operator;
 
     public enum TeleopMode {
-        RED,
-        BLUE
+        FIELD,
+        ROBOT
     }
     public MyRobot (LinearOpMode opMode, TeleopMode mode) {
         this.opMode = opMode;
@@ -54,7 +54,61 @@ public class MyRobot extends Robot {
     }
 
     public void initTele (TeleopMode mode){
-        if (mode == TeleopMode.RED){
+        if (mode == TeleopMode.FIELD){
+            drive = new DriveSubsystem(this);
+            intake = new Intake(this);
+            shooter = new ScoringSubsystem(this);
+            scoringIntake = new ScoringIntakeSubsystem(this);
+            drive.setFieldOriented(true);
+
+            defaultDriveCommand = new DefaultDriveCommand(drive,
+                    driver::getLeftX,
+                    driver::getLeftY,
+                    driver::getRightX
+            );
+
+            slowModeCommand = new SlowModeCommand(drive,
+                    driver::getLeftX,
+                    driver::getLeftY,
+                    driver::getRightX
+            );
+
+            CommandScheduler.getInstance().setDefaultCommand(drive, defaultDriveCommand);
+            CommandScheduler.getInstance().setDefaultCommand(shooter, new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD));
+            CommandScheduler.getInstance().setDefaultCommand(intake, new ActuateIntakeCommand(intake, IntakeState.BACKWARD));
+            Button driverSlowMode = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+            Button shooterStart = new GamepadButton(operator, GamepadKeys.Button.RIGHT_BUMPER);
+            Button autoDrive = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
+            Button shooterReverse = new GamepadButton(operator, GamepadKeys.Button.A);
+            Button shooterStop = new GamepadButton(driver, GamepadKeys.Button.X);
+
+            driverSlowMode
+                    .whenPressed(slowModeCommand)
+                    .whenReleased(defaultDriveCommand);
+            
+            /*autoDrive
+                    .whenPressed(new AutoDriveCommand(drive))
+                            .whenReleased(defaultDriveCommand);*/
+            shooterStart
+                    .whenPressed(
+                            new ParallelCommandGroup
+                                    (
+                                            new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD),
+                                            new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.SHOOT)
+                                    ))
+                            .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));
+
+            shooterReverse
+                    .whenPressed(new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.BACKWARD))
+                    .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));;
+
+            /*shooterStop
+                    .whenPressed(new ParallelCommandGroup
+                            (
+                                    new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT)
+                            ));*/
+
+        }if (mode == TeleopMode.ROBOT){
             drive = new DriveSubsystem(this);
             intake = new Intake(this);
             shooter = new ScoringSubsystem(this);
@@ -77,35 +131,36 @@ public class MyRobot extends Robot {
             CommandScheduler.getInstance().setDefaultCommand(shooter, new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD));
             CommandScheduler.getInstance().setDefaultCommand(intake, new ActuateIntakeCommand(intake, IntakeState.BACKWARD));
             Button driverSlowMode = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
-            Button shooterStart = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER);
+            Button shooterStart = new GamepadButton(operator, GamepadKeys.Button.RIGHT_BUMPER);
             Button autoDrive = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
-            Button shooterReverse = new GamepadButton(driver, GamepadKeys.Button.A);
+            Button shooterReverse = new GamepadButton(operator, GamepadKeys.Button.A);
             Button shooterStop = new GamepadButton(driver, GamepadKeys.Button.X);
 
             driverSlowMode
                     .whenPressed(slowModeCommand)
                     .whenReleased(defaultDriveCommand);
-            
-            autoDrive
+
+            /*autoDrive
                     .whenPressed(new AutoDriveCommand(drive))
-                            .whenReleased(defaultDriveCommand);
+                            .whenReleased(defaultDriveCommand);*/
             shooterStart
                     .whenPressed(
                             new ParallelCommandGroup
                                     (
+                                            new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.FORWARD),
                                             new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.SHOOT)
                                     ))
-                            .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));
+                    .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));
 
             shooterReverse
                     .whenPressed(new SpinShooterCommand(shooter, ScoringSubsystem.ShooterState.BACKWARD))
                     .whenReleased(new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT));;
 
-            shooterStop
+            /*shooterStop
                     .whenPressed(new ParallelCommandGroup
                             (
                                     new SpinScoringIntakeCommand(scoringIntake, ScoringIntakeSubsystem.ScoringIntakeState.INIT)
-                            ));
+                            ));*/
 
         }
     }

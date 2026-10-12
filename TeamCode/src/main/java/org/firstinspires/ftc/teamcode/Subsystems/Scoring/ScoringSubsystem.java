@@ -12,8 +12,8 @@ public class ScoringSubsystem extends SubsystemBase {
     public DcMotorEx Shooter;
     public DcMotor IntakeBack;
     public double INIT = 0;
-    public static double FORWARD = 950;
-    public static double BACKWARD = -950;
+    public static double FORWARD = 980;
+    public static double BACKWARD = -980;
     public static double kp = 150;// 170
     public static double ki = 0;
     public static double kd = 0;
