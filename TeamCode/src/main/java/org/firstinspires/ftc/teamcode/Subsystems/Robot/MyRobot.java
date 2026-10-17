@@ -56,9 +56,9 @@ public class MyRobot extends Robot {
     public void initTele (TeleopMode mode){
         if (mode == TeleopMode.FIELD){
             drive = new DriveSubsystem(this);
-            intake = new Intake(this);
-            shooter = new ScoringSubsystem(this);
-            scoringIntake = new ScoringIntakeSubsystem(this);
+            intake = new Intake(this.hardwareMap);
+            shooter = new ScoringSubsystem(this.hardwareMap);
+            scoringIntake = new ScoringIntakeSubsystem(this.hardwareMap);
             drive.setFieldOriented(true);
 
             defaultDriveCommand = new DefaultDriveCommand(drive,
@@ -119,9 +119,9 @@ public class MyRobot extends Robot {
 
         }if (mode == TeleopMode.ROBOT){
             drive = new DriveSubsystem(this);
-            intake = new Intake(this);
-            shooter = new ScoringSubsystem(this);
-            scoringIntake = new ScoringIntakeSubsystem(this);
+            intake = new Intake(this.hardwareMap);
+            shooter = new ScoringSubsystem(this.hardwareMap);
+            scoringIntake = new ScoringIntakeSubsystem(this.hardwareMap);
             drive.setFieldOriented(false);
 
             defaultDriveCommand = new DefaultDriveCommand(drive,

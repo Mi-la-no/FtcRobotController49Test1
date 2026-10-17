@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringIntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Scoring.ScoringSubsystem;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "AutoPath", group = "Autonomous")
+@Autonomous(name = "AutoPath1", group = "Autonomous")
 public class AutoPath extends LinearOpMode {
 
     private Follower follower;
@@ -113,6 +113,9 @@ public class AutoPath extends LinearOpMode {
         follower = Constants.create(hardwareMap);
         follower.setPose(start);
         follower.update();
+        intake = new Intake(hardwareMap);
+        scoringIntake = new ScoringIntakeSubsystem(hardwareMap);
+        shooter = new ScoringSubsystem(hardwareMap);
 
         waitForStart();
         schedule(autoRoutine());
@@ -124,6 +127,7 @@ public class AutoPath extends LinearOpMode {
             telemetry.addData("x", follower.pose().x());
             telemetry.addData("y", follower.pose().y());
             telemetry.addData("heading", follower.pose().heading());
+            telemetry.addData("ShooterVel", shooter.getVelocity());
 
             if (follower.currentPath() != null) {
                 telemetry.addData("Current path distance remaining", follower.distanceToEndpoint());

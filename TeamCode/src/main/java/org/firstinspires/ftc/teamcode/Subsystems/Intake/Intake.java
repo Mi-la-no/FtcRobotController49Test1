@@ -21,9 +21,9 @@ public class Intake extends SubsystemBase{
         BACKWARD
     }
 
-    public Intake (MyRobot robot){
-        this.IntakeFront = robot.hardwareMap.get(DcMotor.class, "IntakeFront");
-        this.IntakeServo = robot.hardwareMap.get(CRServo.class, "IntakeServo");
+    public Intake (HardwareMap hardwareMap){
+        this.IntakeFront = hardwareMap.get(DcMotor.class, "IntakeFront");
+        this.IntakeServo = hardwareMap.get(CRServo.class, "IntakeServo");
         this.IntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 

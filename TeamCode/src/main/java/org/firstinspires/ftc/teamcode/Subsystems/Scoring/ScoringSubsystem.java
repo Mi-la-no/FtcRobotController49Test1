@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Robot.MyRobot;
@@ -25,9 +26,13 @@ public class ScoringSubsystem extends SubsystemBase {
         BACKWARD
     }
 
-    public ScoringSubsystem (MyRobot robot){
-        this.Shooter = robot.hardwareMap.get(DcMotorEx.class, "ShooterMotor");
+    public ScoringSubsystem (HardwareMap hardwareMap){
+        this.Shooter = hardwareMap.get(DcMotorEx.class, "ShooterMotor");
         this.Shooter.setVelocityPIDFCoefficients(kp,ki,kd,kf);
+    }
+
+    public double getVelocity (){
+        return Shooter.getVelocity();
     }
 
     public void setShooterState (ShooterState state) {

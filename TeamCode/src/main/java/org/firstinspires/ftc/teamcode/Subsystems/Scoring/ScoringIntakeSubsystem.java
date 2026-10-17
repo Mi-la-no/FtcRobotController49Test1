@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Robot.MyRobot;
 
@@ -21,8 +22,8 @@ public class ScoringIntakeSubsystem extends SubsystemBase {
         REVERSE
     }
 
-    public ScoringIntakeSubsystem(MyRobot robot){
-        this.IntakeBack = robot.hardwareMap.get(DcMotor.class, "IntakeBack");
+    public ScoringIntakeSubsystem(HardwareMap hardwareMap){
+        this.IntakeBack = hardwareMap.get(DcMotor.class, "IntakeBack");
     }
 
 
