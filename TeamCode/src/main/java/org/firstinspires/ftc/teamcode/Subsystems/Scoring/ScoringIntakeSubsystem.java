@@ -12,11 +12,13 @@ public class ScoringIntakeSubsystem extends SubsystemBase {
     public DcMotor IntakeBack;
     public double INIT = 0;
     public static double SHOOT = -1;
+    public static double REVERSE = 1;
 
 
     public enum ScoringIntakeState{
         INIT,
-        SHOOT
+        SHOOT,
+        REVERSE
     }
 
     public ScoringIntakeSubsystem(MyRobot robot){
@@ -32,6 +34,10 @@ public class ScoringIntakeSubsystem extends SubsystemBase {
                 break;
             case SHOOT:
                 vel = SHOOT;
+                break;
+            case REVERSE:
+                vel = REVERSE;
+                break;
         }
         IntakeBack.setPower(vel);
     }
