@@ -6,7 +6,6 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.List;
 
@@ -14,12 +13,8 @@ import java.util.List;
 public class Limelight extends LinearOpMode {
 
     private static final double MIN_CONFIDENCE = 30.0;
-    private static final double REQUIRED_SECONDS = 1.25;
 
     private Limelight3A limelight;
-    private final ElapsedTime pollenTimer = new ElapsedTime();
-
-    private boolean timerStarted = false;
     private boolean pollenConfirmed = false;
 
     @Override
@@ -63,30 +58,14 @@ public class Limelight extends LinearOpMode {
                 }
             }
 
-            if (validPollen) {
-
-                if (!timerStarted) {
-                    pollenTimer.reset();
-                    timerStarted = true;
-                }
-
-                pollenConfirmed =
-                        pollenTimer.seconds() >= REQUIRED_SECONDS;
-
-            } else {
-                timerStarted = false;
-                pollenConfirmed = false;
-            }
+            // Confirm immediately; no timer required.
+            pollenConfirmed = validPollen;
 
             telemetry.addData("Limelight Connected",
                     limelight.isConnected());
             telemetry.addData("Valid Pollen", validPollen);
             telemetry.addData("Best Confidence",
                     "%.1f%%", bestConfidence);
-            telemetry.addData("Detection Time",
-                    "%.2f / %.2f seconds",
-                    timerStarted ? pollenTimer.seconds() : 0.0,
-                    REQUIRED_SECONDS);
             telemetry.addData("POLLEN CONFIRMED",
                     pollenConfirmed ? "YES" : "NO");
 
