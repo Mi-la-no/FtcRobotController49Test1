@@ -12,16 +12,14 @@ import java.util.List;
 @TeleOp(name = "Limelight Testing", group = "Limelight")
 public class Limelight extends LinearOpMode {
 
-    private static final double MIN_CONFIDENCE = 30.0;
-
     private Limelight3A limelight;
-    private boolean pollenConfirmed = false;
 
     @Override
     public void runOpMode() {
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
+        // Use the existing Limelight neural detector pipeline.
         limelight.pipelineSwitch(0);
         limelight.start();
 
@@ -34,40 +32,33 @@ public class Limelight extends LinearOpMode {
         while (opModeIsActive()) {
 
             LLResult result = limelight.getLatestResult();
-            boolean validPollen = false;
-            double bestConfidence = 0.0;
 
             if (result != null && result.isValid()) {
 
                 List<LLResultTypes.DetectorResult> detections =
                         result.getDetectorResults();
 
-                for (LLResultTypes.DetectorResult detection : detections) {
+                telemetry.addData("Detection Count", detections.size());
 
-                    String className = detection.getClassName();
-                    double confidence = detection.getConfidence();
+                for (int i = 0; i < detections.size(); i++) {
 
-                    if (className != null
-                            && className.equalsIgnoreCase("pollen")
-                            && confidence >= MIN_CONFIDENCE) {
+                    LLResultTypes.DetectorResult detection =
+                            detections.get(i);
 
-                        validPollen = true;
-                        bestConfidence = Math.max(
-                                bestConfidence, confidence);
-                    }
+                    telemetry.addData(
+                            "Object " + i,
+                            "%s | Confidence: %.1f%%",
+                            detection.getClassName(),
+                            detection.getConfidence()
+                    );
                 }
-            }
 
-            // Confirm immediately; no timer required.
-            pollenConfirmed = validPollen;
+            } else {
+                telemetry.addLine("No valid detector result.");
+            }
 
             telemetry.addData("Limelight Connected",
                     limelight.isConnected());
-            telemetry.addData("Valid Pollen", validPollen);
-            telemetry.addData("Best Confidence",
-                    "%.1f%%", bestConfidence);
-            telemetry.addData("POLLEN CONFIRMED",
-                    pollenConfirmed ? "YES" : "NO");
 
             telemetry.update();
         }
