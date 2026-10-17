@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase{
         this.IntakeServo.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public void setState (IntakeState state) {
+    public void setState(IntakeState state) {
         double vel = 0;
         switch (state) {
             case INIT:

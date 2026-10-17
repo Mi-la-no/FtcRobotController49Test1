@@ -31,13 +31,13 @@ public class AutoPath extends LinearOpMode {
 
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
-    private final Pose start = poseFactory.of(59.8315, 9.7647, 90);
-    private final Pose path1 = poseFactory.of(8.5831, 23.9573, 270);
-    private final Pose point2Start = poseFactory.of(8.5831, 23.9573, 270);
-    private final Pose point2 = poseFactory.of(8.7859, 8.739, 270);
-    private final Pose point3Start = poseFactory.of(8.7859, 8.739, 270);
+    private final Pose start = poseFactory.of(63, 15, 90);
+    private final Pose path1Pose = poseFactory.of(10.5831, 23.9573, 270);
+    private final Pose point2Start = poseFactory.of(10.5831, 23.9573, 270);
+    private final Pose point2 = poseFactory.of(10.7859, 15.239, 270);
+    private final Pose point3Start = poseFactory.of(10.7859, 15.239, 270);
     private final Pose point3 = poseFactory.of(59.3186, 128.9011, 270);
-    private final Pose point3Control1 = poseFactory.of(10.7296, 73.4216, 0);
+    private final Pose point3Control1 = poseFactory.of(21, 71, 270);
     private final Pose point4Start = poseFactory.of(59.3186, 128.9011, 270);
     private final Pose point4 = poseFactory.of(6.0654, 103.5948, 180);
     private final Pose point5Start = poseFactory.of(6.0654, 103.5948, 180);
@@ -50,60 +50,68 @@ public class AutoPath extends LinearOpMode {
         return sequential(
                 shootStart(),
                 intakeBalls(),
-                waitMs(500),
-                shootBalls(),
                 waitMs(1000),
+                shootBalls(),
+                waitMs(3000),
                 stopShoot(),
                 follow(follower, path1()),
-                follow(follower, path2())
-                //follow(follower, path3()),
+                follow(follower, path2()),
+                follow(follower, path3()),
+                shootBalls(),
+                waitMs(1500),
+                stopShoot()
                 //follow(follower, path4()),
                 //follow(follower, path5()),
                 //follow(follower, path6())
         );
     }
 
+
+
     private Command shootStart() {
-        return Command.build()
-                .setExecute(() -> {
-                    shooter.setShooterState(ScoringSubsystem.ShooterState.FORWARD);
-                })
-                .setDone(() -> {
-                    return true;
-                })
+        return instant(() -> shooter.setShooterState(ScoringSubsystem.ShooterState.FORWARD))
                 .requiring(shooter);
     }
     private Command intakeBalls() {
-        return Command.build()
+        /*return Command.build()
                 .setExecute(() -> {
                     intake.setState(Intake.IntakeState.BACKWARD);
                 })
                 .setDone(() -> {
                     return true;
                 })
+                .requiring(intake);*/
+        return instant(() -> intake.setState(Intake.IntakeState.BACKWARD))
                 .requiring(intake);
+
     }
 
     private Command shootBalls(){
-        return Command.build()
+        /*return Command.build()
                 .setExecute(() -> {
                     scoringIntake.setScoringIntakeState(ScoringIntakeSubsystem.ScoringIntakeState.SHOOT);
                 })
                 .setDone(() -> {
                     return true;
                 })
+                .requiring(scoringIntake);*/
+        return instant(() -> scoringIntake.setScoringIntakeState(ScoringIntakeSubsystem.ScoringIntakeState.SHOOT))
                 .requiring(scoringIntake);
+
     }
 
     private Command stopShoot(){
-        return Command.build()
+        /*return Command.build()
                 .setExecute(() -> {
                     scoringIntake.setScoringIntakeState(ScoringIntakeSubsystem.ScoringIntakeState.INIT);
                 })
                 .setDone(() -> {
                     return true;
                 })
+                .requiring(scoringIntake);*/
+        return instant(() -> scoringIntake.setScoringIntakeState(ScoringIntakeSubsystem.ScoringIntakeState.INIT))
                 .requiring(scoringIntake);
+
     }
 
 
@@ -118,11 +126,18 @@ public class AutoPath extends LinearOpMode {
         shooter = new ScoringSubsystem(hardwareMap);
 
         waitForStart();
+//        schedule(shootStart());
+//        schedule(intakeBalls());
+//        schedule(waitMs(500));
+//        schedule(shootBalls());
+//        schedule(waitMs(1000));
+//        schedule(stopShoot());
         schedule(autoRoutine());
 
         while (opModeIsActive()) {
-            follower.update();
             Scheduler.execute();
+            follower.update();
+
 
             telemetry.addData("x", follower.pose().x());
             telemetry.addData("y", follower.pose().y());
@@ -139,7 +154,7 @@ public class AutoPath extends LinearOpMode {
     }
 
     public Path path1() {
-        return Paths.line(start, path1).linear(start, path1);
+        return Paths.line(start, path1Pose).linear(start, path1Pose);
     }
 
     public Path path2() {
@@ -148,8 +163,8 @@ public class AutoPath extends LinearOpMode {
 
 
 
-    /*public Path path3() {
-        return Paths.curve(point2, point3Control1, point3).tangent();
+    public Path path3() {
+        return Paths.curve(point3Start, point3Control1, point3).constant(point3Start);
     }
 
     /*public Path path4() {
